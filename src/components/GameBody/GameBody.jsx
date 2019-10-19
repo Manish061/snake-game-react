@@ -156,23 +156,23 @@ function GameBody(props) {
                 }
             }
 
-            if (xSnake === xSnake2) {
-                if (xSnake === 0) {
-                    setXSnake2(++xSnake2)
-                } else if (xSnake === props.width) {
-                    setXSnake(--xSnake);
-                } else {
-                    setXSnake(--xSnake);
-                }
-            } else if (ySnake === ySnake2) {
-                if (ySnake === 0) {
-                    setYSnake2(++ySnake2)
-                } else if (ySnake === props.height) {
-                    setYSnake(--ySnake);
-                } else {
-                    setYSnake(--ySnake);
-                }
-            }
+            // if (xSnake === xSnake2) {
+            //     if (xSnake === 0) {
+            //         setXSnake2(++xSnake2)
+            //     } else if (xSnake === props.width) {
+            //         setXSnake(--xSnake);
+            //     } else {
+            //         setXSnake(--xSnake);
+            //     }
+            // } else if (ySnake === ySnake2) {
+            //     if (ySnake === 0) {
+            //         setYSnake2(++ySnake2)
+            //     } else if (ySnake === props.height) {
+            //         setYSnake(--ySnake);
+            //     } else {
+            //         setYSnake(--ySnake);
+            //     }
+            // }
         }
 
         // Snake 2 Movement
