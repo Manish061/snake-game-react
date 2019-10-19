@@ -41,10 +41,32 @@ function GameBody(props) {
     // let [xSnake2, setXSnake2] = useState(parseInt(Math.random() * (props.width - 70)), 10);
     // let [ySnake2, setYSnake2] = useState(parseInt(Math.random() * (props.height - 70)), 10);
 
-    let [xSnake2, setXSnake2] = useState(180);
-    let [ySnake2, setYSnake2] = useState(190);
+    let [xSnake2, setXSnake2] = useState(480);
+    let [ySnake2, setYSnake2] = useState(490);
 
-    const eventRef = useRef();
+    // uncomment below line to use keystrokes
+
+    // const eventRef = useRef();
+
+    const eventXRef = useRef();
+    const eventYRef = useRef();
+
+    useEffect(() => {
+        window.addEventListener('mousemove', (event) => {
+            const xPos = event.clientX;
+            const yPos = event.clientY;
+            eventXRef.current = xPos;
+            eventYRef.current = yPos;
+        }, false);
+
+
+        // uncomment below lines to use keystrokes
+
+        // window.addEventListener('keydown', (event) => {
+        //     const direction = event.key;
+        //     eventRef.current = direction;
+        // }, false);
+    }, [])
 
     useAnimationFrame((time) => {
         const canvas = document.getElementById('game');
@@ -52,7 +74,12 @@ function GameBody(props) {
         const food = new Image();
         const snake = new Image();
         const snake2 = new Image();
-        const direction = eventRef.current;
+
+
+        // uncomment below line to use keystrokes
+
+        // const direction = eventRef.current;
+
 
         // Food Movement
         const foodMove = (direction) => {
@@ -85,16 +112,13 @@ function GameBody(props) {
             }
         }
 
+        // comment below two lines to use keystrokes
+
+        setX(x = eventXRef.current);
+        setX(y = eventYRef.current);
+
         // Snake 1 Movement
         const snakeOneMove = () => {
-            const xSnakeDist = Math.abs(xSnake - xSnake2);
-            const ySnakeDist = Math.abs(ySnake - ySnake2);
-
-            if(xSnakeDist <= 70 && ySnakeDist <= 70) {
-                return;
-            }
-
-
             if (xSnake === x && ySnake === y) {
                 window.cancelAnimationFrame(time);
                 return;
@@ -131,10 +155,34 @@ function GameBody(props) {
                     }
                 }
             }
+
+            if (xSnake === xSnake2) {
+                if (xSnake === 0) {
+                    setXSnake2(++xSnake2)
+                } else if (xSnake === props.width) {
+                    setXSnake(--xSnake);
+                } else {
+                    setXSnake(--xSnake);
+                }
+            } else if (ySnake === ySnake2) {
+                if (ySnake === 0) {
+                    setYSnake2(++ySnake2)
+                } else if (ySnake === props.height) {
+                    setYSnake(--ySnake);
+                } else {
+                    setYSnake(--ySnake);
+                }
+            }
         }
 
         // Snake 2 Movement
         const snakeTwoMove = () => {
+            // const xSnakeDist = Math.abs(xSnake - xSnake2);
+            // const ySnakeDist = Math.abs(ySnake - ySnake2);
+
+            // if(xSnakeDist <= 70 || ySnakeDist <= 70) {
+            //     return;
+            // }
             if (xSnake2 === x && ySnake2 === y) {
                 window.cancelAnimationFrame(time);
                 return;
@@ -173,7 +221,10 @@ function GameBody(props) {
             }
         }
 
-        foodMove(direction);
+        // uncomment below to use keystrokes
+
+        // foodMove(direction);
+        
         snakeOneMove();
         snakeTwoMove();
 
@@ -187,10 +238,7 @@ function GameBody(props) {
         snake.src = burger;
         snake2.src = burger
     });
-    window.addEventListener('keydown', (event) => {
-        const direction = event.key;
-        eventRef.current = direction;
-    }, false);
+
 
     return (
         <canvas id="game" width={props.width} height={props.height} className={GameBodyStyles.container}>
@@ -205,8 +253,8 @@ GameBody.propTypes = {
 };
 
 GameBody.defaultProps = {
-    width: 300,
-    height: 300,
+    width: 600,
+    height: 600,
     speed: 5
 };
 
