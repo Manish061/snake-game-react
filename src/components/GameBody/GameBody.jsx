@@ -26,23 +26,13 @@ class Queue {
 
 
 function GameBody(props) {
-    // let [x, setX] = useState(parseInt(Math.random() * (props.width - 70)), 10);
-    // let [y, setY] = useState(parseInt(Math.random() * (props.height - 70)), 10);
 
-    let [x, setX] = useState(150);
-    let [y, setY] = useState(150);
+    let [x, setX] = useState(props.x);
+    let [y, setY] = useState(props.y);
 
-    // let [xSnake, setXSnake] = useState(parseInt(Math.random() * (props.width - 70)), 10);
-    // let [ySnake, setYSnake] = useState(parseInt(Math.random() * (props.height - 70)), 10);
+    let [xSnake, setXSnake] = useState(props.xSnake);
+    let [ySnake, setYSnake] = useState(props.ySnake);
 
-    let [xSnake, setXSnake] = useState(20);
-    let [ySnake, setYSnake] = useState(30);
-
-    // let [xSnake2, setXSnake2] = useState(parseInt(Math.random() * (props.width - 70)), 10);
-    // let [ySnake2, setYSnake2] = useState(parseInt(Math.random() * (props.height - 70)), 10);
-
-    let [xSnake2, setXSnake2] = useState(480);
-    let [ySnake2, setYSnake2] = useState(490);
 
     // uncomment below line to use keystrokes
 
@@ -50,14 +40,42 @@ function GameBody(props) {
 
     const eventXRef = useRef();
     const eventYRef = useRef();
+    const canvasRef = useRef();
+    const ctxRef = useRef();
+    const foodRef = useRef();
+    const snakesRef = new Array(xSnake.length).fill(useRef());
 
+    const mouseMoveHandler = (event) => {
+        const xPos = event.clientX;
+        const yPos = event.clientY;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const scaleX = canvasRef.current.width / rect.width;
+        const scaleY = canvasRef.current.height / rect.height;
+        eventXRef.current = parseInt((xPos - rect.left) * scaleX, 10);
+        eventYRef.current = parseInt((yPos - rect.top) * scaleY, 10);
+    }
     useEffect(() => {
-        window.addEventListener('mousemove', (event) => {
-            const xPos = event.clientX;
-            const yPos = event.clientY;
-            eventXRef.current = xPos;
-            eventYRef.current = yPos;
-        }, false);
+        window.addEventListener('mousemove', mouseMoveHandler, false);
+        canvasRef.current = document.getElementById('game');
+        ctxRef.current = canvasRef.current.getContext('2d');
+        foodRef.current = new Image();
+        snakesRef.forEach(el => {
+            el.current = new Image();
+        });
+
+
+        foodRef.current.onload = () => {
+            ctxRef.current.clearRect(0, 0, props.width, props.height);
+            ctxRef.current.drawImage(foodRef.current, x, y, 20, 20);
+            snakesRef.forEach((el, i) => {
+                ctxRef.current.drawImage(el.current, xSnake[i], ySnake[i], 50, 50);
+            });
+        }
+
+        foodRef.current.src = burger;
+        snakesRef.forEach(el => {
+            el.current.src = burger;
+        })
 
 
         // uncomment below lines to use keystrokes
@@ -69,11 +87,6 @@ function GameBody(props) {
     }, [])
 
     useAnimationFrame((time) => {
-        const canvas = document.getElementById('game');
-        const ctx = canvas.getContext('2d');
-        const food = new Image();
-        const snake = new Image();
-        const snake2 = new Image();
 
 
         // uncomment below line to use keystrokes
@@ -81,181 +94,134 @@ function GameBody(props) {
         // const direction = eventRef.current;
 
 
-        // Food Movement
-        const foodMove = (direction) => {
-            if (direction === 'ArrowUp') {
-                if (y <= 0) {
-                    setY(y = props.height);
-                } else {
-                    setY(--y);
-                }
-            } else if (direction === 'ArrowRight') {
-                if (x >= props.width) {
-                    setX(x = 0);
-                } else {
-                    setX(++x);
-                }
-            } else if (direction === 'ArrowLeft') {
-                if (x <= 0) {
-                    setX(x = props.width);
-                } else {
-                    setX(--x);
-                }
-            } else if (direction === 'ArrowDown') {
-                if (y >= props.height) {
-                    setY(y = 0);
-                } else {
-                    setY(++y);
-                }
-            } else {
-                return;
-            }
-        }
+        // Food Movement, un-comment below to use key strokes
+        // const foodMove = (direction) => {
+        //     if (direction === 'ArrowUp') {
+        //         if (y <= 0) {
+        //             setY(y = props.height);
+        //         } else {
+        //             setY(--y);
+        //         }
+        //     } else if (direction === 'ArrowRight') {
+        //         if (x >= props.width) {
+        //             setX(x = 0);
+        //         } else {
+        //             setX(++x);
+        //         }
+        //     } else if (direction === 'ArrowLeft') {
+        //         if (x <= 0) {
+        //             setX(x = props.width);
+        //         } else {
+        //             setX(--x);
+        //         }
+        //     } else if (direction === 'ArrowDown') {
+        //         if (y >= props.height) {
+        //             setY(y = 0);
+        //         } else {
+        //             setY(++y);
+        //         }
+        //     } else {
+        //         return;
+        //     }
+        // }
 
         // comment below two lines to use keystrokes
 
         setX(x = eventXRef.current);
-        setX(y = eventYRef.current);
+        setY(y = eventYRef.current);
 
-        // Snake 1 Movement
-        const snakeOneMove = () => {
-            if (xSnake === x && ySnake === y) {
-                window.cancelAnimationFrame(time);
-                return;
-            } else if (xSnake === x) {
-                if (y > ySnake) {
-                    setYSnake(++ySnake)
-                } else {
-                    setYSnake(--ySnake)
-                }
-            } else if (ySnake === y) {
-                if (x > xSnake) {
-                    setXSnake(++xSnake)
-                } else {
-                    setXSnake(--xSnake)
-                }
-            } else {
-                let xDist = x - xSnake;
-                let yDist = y - ySnake;
-                if (xDist > 0) {
-                    if (yDist > 0) {
-                        setXSnake(++xSnake);
-                        setYSnake(++ySnake);
-                    } else {
-                        setXSnake(++xSnake);
-                        setYSnake(--ySnake);
-                    }
-                } else {
-                    if (yDist > 0) {
-                        setXSnake(--xSnake);
-                        setYSnake(++ySnake);
-                    } else {
-                        setXSnake(--xSnake);
-                        setYSnake(--ySnake);
-                    }
-                }
-            }
-
-            // if (xSnake === xSnake2) {
-            //     if (xSnake === 0) {
-            //         setXSnake2(++xSnake2)
-            //     } else if (xSnake === props.width) {
-            //         setXSnake(--xSnake);
-            //     } else {
-            //         setXSnake(--xSnake);
-            //     }
-            // } else if (ySnake === ySnake2) {
-            //     if (ySnake === 0) {
-            //         setYSnake2(++ySnake2)
-            //     } else if (ySnake === props.height) {
-            //         setYSnake(--ySnake);
-            //     } else {
-            //         setYSnake(--ySnake);
-            //     }
-            // }
-        }
-
-        // Snake 2 Movement
-        const snakeTwoMove = () => {
-            // const xSnakeDist = Math.abs(xSnake - xSnake2);
-            // const ySnakeDist = Math.abs(ySnake - ySnake2);
-
-            // if(xSnakeDist <= 70 || ySnakeDist <= 70) {
+        // Snake Movement
+        const snakeMove = () => {
+            // if (y > (props.height / 2)) {
             //     return;
             // }
-            if (xSnake2 === x && ySnake2 === y) {
-                window.cancelAnimationFrame(time);
+            const snakeXCopy = xSnake.slice(0)
+            const snakeYCopy = ySnake.slice(0);
+            if (snakeXCopy.length !== snakeYCopy.length) {
                 return;
-            } else if (xSnake2 === x) {
-                if (y > ySnake2) {
-                    setYSnake2(++ySnake2)
-                } else {
-                    setYSnake2(--ySnake2)
-                }
-            } else if (ySnake2 === y) {
-                if (x > xSnake2) {
-                    setXSnake2(++xSnake2)
-                } else {
-                    setXSnake2(--xSnake2)
-                }
-            } else {
-                let xDist = x - xSnake2;
-                let yDist = y - ySnake2;
-                if (xDist > 0) {
-                    if (yDist > 0) {
-                        setXSnake2(++xSnake2);
-                        setYSnake2(++ySnake2);
-                    } else {
-                        setXSnake2(++xSnake2);
-                        setYSnake2(--ySnake2);
-                    }
-                } else {
-                    if (yDist > 0) {
-                        setXSnake2(--xSnake2);
-                        setYSnake2(++ySnake2);
-                    } else {
-                        setXSnake2(--xSnake2);
-                        setYSnake2(--ySnake2);
-                    }
-                }
             }
+            snakeXCopy.forEach((_, i) => {
+                let xDist = x - snakeXCopy[i];
+                let yDist = y - snakeYCopy[i];
+
+                if (yDist > 0) {
+                    snakeYCopy[i] += props.speed;
+                } else if (yDist < 0) {
+                    snakeYCopy[i] -= props.speed;
+                }
+                if (xDist > 0) {
+                    snakeXCopy[i] += props.speed;
+
+                } else if (xDist < 0) {
+                    snakeXCopy[i] -= props.speed;
+                }
+            });
+            setXSnake(snakeXCopy);
+            setYSnake(snakeYCopy);
         }
 
         // uncomment below to use keystrokes
 
         // foodMove(direction);
-        
-        snakeOneMove();
-        snakeTwoMove();
 
-        food.onload = () => {
-            ctx.clearRect(0, 0, props.width, props.height);
-            ctx.drawImage(food, x, y, 20, 20);
-            ctx.drawImage(snake, xSnake, ySnake, 50, 50);
-            ctx.drawImage(snake2, xSnake2, ySnake2, 50, 50);
+        const gameOver = () => {
+            const snakeXCopy = xSnake.slice(0)
+            const snakeYCopy = ySnake.slice(0);
+            if (snakeXCopy.length !== snakeYCopy.length) {
+                return;
+            }
+            snakeXCopy.forEach((el, i) => {
+                if (Math.abs(x - snakeXCopy[i]) <= props.deltaMismatch && Math.abs(y - snakeYCopy[i]) <= props.deltaMismatch) {
+                    ctxRef.current.clearRect(0, 0, props.width, props.height);
+                    ctxRef.current.fillText("Game Over!", props.width / 2, props.height / 2);
+                    window.removeEventListener('mousemove', mouseMoveHandler);
+                    return;
+                }
+            })
         }
-        food.src = burger;
-        snake.src = burger;
-        snake2.src = burger
+
+        const draw = () => {
+            ctxRef.current.clearRect(0, 0, props.width, props.height);
+            ctxRef.current.drawImage(foodRef.current, x, y, 20, 20);
+            snakesRef.forEach((el, i) => {
+                ctxRef.current.drawImage(el.current, xSnake[i], ySnake[i], 50, 50);
+            });
+        }
+
+        gameOver();
+        snakeMove();
+        draw();
     });
 
 
     return (
-        <canvas id="game" width={props.width} height={props.height} className={GameBodyStyles.container}>
-            Your browser does not support the HTML5 canvas tag.
-        </canvas>
+        <>
+            <canvas id="game" width={props.width} height={props.height} className={GameBodyStyles.container}>
+                Your browser does not support the HTML5 canvas tag.
+            </canvas>
+            <button className={GameBodyStyles.container}>Click to Start!!!</button>
+        </>
     )
 }
 
 GameBody.propTypes = {
     width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired
+    height: PropTypes.number.isRequired,
+    speed: PropTypes.number,
+    deltaMismatch: PropTypes.number,
+    separatingDistance: PropTypes.number,
+    xSnake: PropTypes.array,
+    ySnake: PropTypes.array
 };
 
 GameBody.defaultProps = {
     width: 600,
     height: 600,
-    speed: 5
+    speed: 4,
+    deltaMismatch: 5,
+    separatingDistance: 20,
+    xSnake: [],
+    ySnake: []
 };
 
 export default GameBody;

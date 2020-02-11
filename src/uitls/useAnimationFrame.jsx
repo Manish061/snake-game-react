@@ -12,6 +12,7 @@ const useAnimationFrame = callback => {
       }
       previousTimeRef.current = time;
       requestRef.current = requestAnimationFrame(animate);
+      return cancelAnimationFrame(time);
     }
     
     React.useEffect(() => {
